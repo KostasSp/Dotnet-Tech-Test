@@ -372,6 +372,44 @@ public class PaymentServiceTests
         Assert.Equal(90, account.Balance);
         dataStoreMock.Verify(x => x.UpdateAccount(account), Times.Once);
     }
+
+    [Fact]
+    public void MakePayment_ReturnsSuccess_WhenBalanceIsEqualToAmount_ForFasterPayments()
+    {
+        var request = new MakePaymentRequest
+        {
+            DebtorAccountNumber = "111",
+            Amount = 100,
+            PaymentScheme = PaymentScheme.FasterPayments
+        };
+
+        var account = new Account
+        {
+            AccountNumber = "111",
+            Balance = 100,
+            AllowedPaymentSchemes = AllowedPaymentSchemes.FasterPayments
+        };
+
+        var dataStoreMock = new Mock<IAccountDataStore>();
+        dataStoreMock
+            .Setup(x => x.GetAccount("111"))
+            .Returns(account);
+
+        var factoryMock = new Mock<IAccountDataStoreFactory>();
+        factoryMock
+            .Setup(x => x.Create())
+            .Returns(dataStoreMock.Object);
+
+        var sut = new PaymentService(
+            factoryMock.Object,
+            new IPaymentValidator[] { new FasterPaymentsValidator() });
+
+        var result = sut.MakePayment(request);
+
+        Assert.True(result.Success);
+        Assert.Equal(0, account.Balance);
+        dataStoreMock.Verify(x => x.UpdateAccount(account), Times.Once);
+    }
     #endregion
 
     #region Factory tests
