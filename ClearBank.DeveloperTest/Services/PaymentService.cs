@@ -22,8 +22,6 @@ namespace ClearBank.DeveloperTest.Services
 
         public MakePaymentResult MakePayment(MakePaymentRequest request)
         {
-            ArgumentNullException.ThrowIfNull(request);
-
             var dataStore = _dataStoreFactory.Create();
             var account = dataStore.GetAccount(request.DebtorAccountNumber);
 

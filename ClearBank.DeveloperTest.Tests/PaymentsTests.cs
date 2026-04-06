@@ -14,18 +14,6 @@ namespace ClearBank.DeveloperTest.Tests;
 public class PaymentServiceTests
 {
     [Fact]
-    public void MakePayment_ThrowsArgumentNullException_WhenRequestIsNull()
-    {
-        var dataStoreFactoryMock = new Mock<IAccountDataStoreFactory>();
-        var ruleMock = new Mock<IPaymentValidator>();
-
-        var sut = new PaymentService(
-            dataStoreFactoryMock.Object,
-            new[] { ruleMock.Object });
-
-        Assert.Throws<ArgumentNullException>(() => sut.MakePayment(null));
-    }
-    [Fact]
     public void MakePayment_ReturnsFailure_WhenNoRuleExistsForPaymentScheme()
     {
         var dataStoreMock = new Mock<IAccountDataStore>();
