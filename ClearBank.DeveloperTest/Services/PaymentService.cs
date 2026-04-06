@@ -1,11 +1,24 @@
 ﻿using ClearBank.DeveloperTest.Data;
+using ClearBank.DeveloperTest.Services.PaymentValidators;
 using ClearBank.DeveloperTest.Types;
+using System;
+using System.Collections.Generic;
 using System.Configuration;
+using System.Linq;
 
 namespace ClearBank.DeveloperTest.Services
 {
     public class PaymentService : IPaymentService
     {
+        private readonly IAccountDataStoreFactory _dataStoreFactory;
+        private readonly IDictionary<PaymentScheme, IPaymentRule> _paymentRules;
+
+        public PaymentService(IAccountDataStoreFactory dataStoreFactory, IEnumerable<IPaymentRule> paymentRules)
+        {
+            _dataStoreFactory = dataStoreFactory;
+            _paymentRules = paymentRules?.ToDictionary(v => v.PaymentScheme);
+        }
+
         public MakePaymentResult MakePayment(MakePaymentRequest request)
         {
             var dataStoreType = ConfigurationManager.AppSettings["DataStoreType"];
