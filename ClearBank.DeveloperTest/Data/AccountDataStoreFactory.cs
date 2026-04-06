@@ -20,7 +20,10 @@ namespace ClearBank.DeveloperTest.Data
 
         public IAccountDataStore Create()
         {
-            throw new NotImplementedException();
+            var dataStoreType = _configuration["DataStoreType"];
+            return dataStoreType == "Backup"
+                ? new BackupAccountDataStore()
+                : new AccountDataStore();
         }
     }
 }

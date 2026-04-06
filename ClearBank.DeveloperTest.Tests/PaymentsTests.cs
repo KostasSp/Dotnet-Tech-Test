@@ -17,7 +17,7 @@ public class PaymentServiceTests
     public void MakePayment_ThrowsArgumentNullException_WhenRequestIsNull()
     {
         var dataStoreFactoryMock = new Mock<IAccountDataStoreFactory>();
-        var ruleMock = new Mock<IPaymentRule>();
+        var ruleMock = new Mock<IPaymentValidator>();
 
         var sut = new PaymentService(
             dataStoreFactoryMock.Object,
@@ -34,7 +34,7 @@ public class PaymentServiceTests
         var factoryMock = new Mock<IAccountDataStoreFactory>();
         factoryMock.Setup(x => x.Create()).Returns(dataStoreMock.Object);
 
-        var ruleMock = new Mock<IPaymentRule>();
+        var ruleMock = new Mock<IPaymentValidator>();
         ruleMock.SetupGet(x => x.PaymentScheme).Returns(PaymentScheme.Chaps);
 
         var sut = new PaymentService(factoryMock.Object, new[] { ruleMock.Object });
@@ -75,7 +75,7 @@ public class PaymentServiceTests
 
         var sut = new PaymentService(
             factoryMock.Object,
-            new IPaymentRule[] { new BacsPaymentValidator() });
+            new IPaymentValidator[] { new BacsPaymentValidator() });
 
         var result = sut.MakePayment(request);
 
@@ -109,7 +109,7 @@ public class PaymentServiceTests
 
         var sut = new PaymentService(
             factoryMock.Object,
-            new IPaymentRule[] { new BacsPaymentValidator() });
+            new IPaymentValidator[] { new BacsPaymentValidator() });
 
         var result = sut.MakePayment(request);
 
@@ -142,7 +142,7 @@ public class PaymentServiceTests
 
         var sut = new PaymentService(
             factoryMock.Object,
-            new IPaymentRule[] { new ChapsPaymentValidator() });
+            new IPaymentValidator[] { new ChapsPaymentValidator() });
 
         var result = sut.MakePayment(request);
 
@@ -180,7 +180,7 @@ public class PaymentServiceTests
 
         var sut = new PaymentService(
             factoryMock.Object,
-            new IPaymentRule[] { new ChapsPaymentValidator() });
+            new IPaymentValidator[] { new ChapsPaymentValidator() });
 
         var result = sut.MakePayment(request);
 
@@ -218,7 +218,7 @@ public class PaymentServiceTests
 
         var sut = new PaymentService(
             factoryMock.Object,
-            new IPaymentRule[] { new ChapsPaymentValidator() });
+            new IPaymentValidator[] { new ChapsPaymentValidator() });
 
         var result = sut.MakePayment(request);
 
@@ -256,7 +256,7 @@ public class PaymentServiceTests
 
         var sut = new PaymentService(
             factoryMock.Object,
-            new IPaymentRule[] { new ChapsPaymentValidator() });
+            new IPaymentValidator[] { new ChapsPaymentValidator() });
 
         var result = sut.MakePayment(request);
 
@@ -289,7 +289,7 @@ public class PaymentServiceTests
 
         var sut = new PaymentService(
             factoryMock.Object,
-            new IPaymentRule[] { new FasterPaymentsValidator() });
+            new IPaymentValidator[] { new FasterPaymentsValidator() });
 
         var result = sut.MakePayment(request);
 
@@ -326,7 +326,7 @@ public class PaymentServiceTests
 
         var sut = new PaymentService(
             factoryMock.Object,
-            new IPaymentRule[] { new FasterPaymentsValidator() });
+            new IPaymentValidator[] { new FasterPaymentsValidator() });
 
         var result = sut.MakePayment(request);
 
@@ -363,7 +363,7 @@ public class PaymentServiceTests
 
         var sut = new PaymentService(
             factoryMock.Object,
-            new IPaymentRule[] { new FasterPaymentsValidator() });
+            new IPaymentValidator[] { new FasterPaymentsValidator() });
 
         var result = sut.MakePayment(request);
 
@@ -400,7 +400,7 @@ public class PaymentServiceTests
 
         var sut = new PaymentService(
             factoryMock.Object,
-            new IPaymentRule[] { new FasterPaymentsValidator() });
+            new IPaymentValidator[] { new FasterPaymentsValidator() });
 
         var result = sut.MakePayment(request);
 
@@ -416,7 +416,7 @@ public class PaymentServiceTests
     {
         var dataStore = new Mock<IAccountDataStore>();
         var factory = new Mock<IAccountDataStoreFactory>();
-        var validator = new Mock<IPaymentRule>();
+        var validator = new Mock<IPaymentValidator>();
 
         factory.Setup(x => x.Create()).Returns(dataStore.Object);
 
@@ -463,6 +463,19 @@ public class PaymentServiceTests
     {
         var configurationMock = new Mock<IConfiguration>();
         configurationMock.Setup(x => x["DataStoreType"]).Returns("Primary");
+
+        var sut = new AccountDataStoreFactory(configurationMock.Object);
+
+        var result = sut.Create();
+
+        Assert.IsType<AccountDataStore>(result);
+    }
+
+    [Fact]
+    public void Create_ReturnsAccountDataStore_WhenDataStoreTypeIsMissing()
+    {
+        var configurationMock = new Mock<IConfiguration>();
+        configurationMock.Setup(x => x["DataStoreType"]).Returns((string)null);
 
         var sut = new AccountDataStoreFactory(configurationMock.Object);
 

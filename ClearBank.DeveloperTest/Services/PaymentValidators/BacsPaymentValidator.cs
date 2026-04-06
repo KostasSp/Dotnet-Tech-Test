@@ -7,13 +7,14 @@ using System.Threading.Tasks;
 
 namespace ClearBank.DeveloperTest.Services.PaymentValidators
 {
-    public class BacsPaymentValidator : IPaymentRule
+    public class BacsPaymentValidator : IPaymentValidator
     {
         public PaymentScheme PaymentScheme => PaymentScheme.Bacs;
 
         public bool IsValid(Account account, MakePaymentRequest request)
         {
-            throw new NotImplementedException();
+            return account != null &&
+                   account.AllowedPaymentSchemes.HasFlag(AllowedPaymentSchemes.Bacs);
         }
     }
 }

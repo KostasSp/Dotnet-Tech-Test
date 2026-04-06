@@ -7,13 +7,15 @@ using System.Threading.Tasks;
 
 namespace ClearBank.DeveloperTest.Services.PaymentValidators
 {
-    public class FasterPaymentsValidator : IPaymentRule
+    public class FasterPaymentsValidator : IPaymentValidator
     {
         public PaymentScheme PaymentScheme => PaymentScheme.FasterPayments;
 
         public bool IsValid(Account account, MakePaymentRequest request)
         {
-            throw new NotImplementedException();
+            return account != null &&
+                   account.AllowedPaymentSchemes.HasFlag(AllowedPaymentSchemes.FasterPayments) &&
+                   account.Balance >= request.Amount;
         }
     }
 }
