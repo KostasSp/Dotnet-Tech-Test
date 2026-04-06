@@ -1,21 +1,16 @@
-### Test Description
-In the 'PaymentService.cs' file you will find a method for making a payment. At a high level the steps for making a payment are:
+## Implemented improvements
 
- - Lookup the account the payment is being made from
- - Check the account is in a valid state to make the payment
- - Deduct the payment amount from the account's balance and update the account in the database
- 
-What we’d like you to do is refactor the code with the following things in mind:  
- - Adherence to SOLID principals
- - Testability  
- - Readability 
+- Introduced `IPaymentValidator` to separate payment scheme validation from `PaymentService`
+- Added dedicated validator classes for each payment scheme
+- Replaced payment scheme branching in `PaymentService` with rule selection by `PaymentScheme`
+- Introduced `IAccountDataStoreFactory` to abstract datastore creation
+- Added `AccountDataStoreFactory` to select the primary or backup datastore from configuration
+- Updated `PaymentService` to depend on `IAccountDataStoreFactory` and a set of `IPaymentValidator` implementations instead of directly handling datastore creation and validation logic
 
-We’d also like you to add some unit tests to the ClearBank.DeveloperTest.Tests project to show how you would test the code that you’ve produced. The only specific ‘rules’ are:  
+## Further improvements with more time
 
- - The solution should build.
- - The tests should all pass.
- - You should not change the method signature of the MakePayment method.
-
-You are free to use any frameworks/NuGet packages that you see fit.  
- 
-You should plan to spend around 1 to 3 hours to complete the exercise.
+- Reduce duplication in tests by introducing builders/helpers and using theories where appropriate
+- Split tests into separate files by concern, for example `PaymentService`, validators, and datastore factory
+- Make `MakePaymentResult` more expressive by using the Results pattern
+- Move balance mutation into a method such as `DebitAmount` (out of `PaymentService`)
+- Change `MakePaymentRequest` to an immutable record
