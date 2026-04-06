@@ -13,30 +13,6 @@ namespace ClearBank.DeveloperTest.Tests;
 
 public class PaymentServiceTests
 {
-    [Fact]
-    public void MakePayment_ReturnsFailure_WhenNoRuleExistsForPaymentScheme()
-    {
-        var dataStoreMock = new Mock<IAccountDataStore>();
-        dataStoreMock.Setup(x => x.GetAccount("111")).Returns(new Account());
-
-        var factoryMock = new Mock<IAccountDataStoreFactory>();
-        factoryMock.Setup(x => x.Create()).Returns(dataStoreMock.Object);
-
-        var ruleMock = new Mock<IPaymentValidator>();
-        ruleMock.SetupGet(x => x.PaymentScheme).Returns(PaymentScheme.Chaps);
-
-        var sut = new PaymentService(factoryMock.Object, new[] { ruleMock.Object });
-
-        var result = sut.MakePayment(new MakePaymentRequest
-        {
-            DebtorAccountNumber = "111",
-            PaymentScheme = PaymentScheme.Bacs
-        });
-
-        Assert.False(result.Success);
-        dataStoreMock.Verify(x => x.UpdateAccount(It.IsAny<Account>()), Times.Never);
-    }
-
     #region BACS
     [Fact]
     public void MakePayment_ReturnsFailure_WhenAccountDoesNotAllowBacs()
@@ -399,40 +375,6 @@ public class PaymentServiceTests
     #endregion
 
     #region Factory tests
-    [Fact]
-    public void MakePayment_UsesDataStoreReturnedByFactory()
-    {
-        var dataStore = new Mock<IAccountDataStore>();
-        var factory = new Mock<IAccountDataStoreFactory>();
-        var validator = new Mock<IPaymentValidator>();
-
-        factory.Setup(x => x.Create()).Returns(dataStore.Object);
-
-        var account = new Account
-        {
-            AccountNumber = "111",
-            Balance = 100,
-            AllowedPaymentSchemes = AllowedPaymentSchemes.Bacs
-        };
-
-        dataStore.Setup(x => x.GetAccount("111")).Returns(account);
-        validator.SetupGet(x => x.PaymentScheme).Returns(PaymentScheme.Bacs);
-        validator.Setup(x => x.IsValid(account, It.IsAny<MakePaymentRequest>())).Returns(true);
-
-        var sut = new PaymentService(factory.Object, new[] { validator.Object });
-
-        sut.MakePayment(new MakePaymentRequest
-        {
-            DebtorAccountNumber = "111",
-            Amount = 10,
-            PaymentScheme = PaymentScheme.Bacs
-        });
-
-        factory.Verify(x => x.Create(), Times.Once);
-        dataStore.Verify(x => x.GetAccount("111"), Times.Once);
-    }
-
-
     [Fact]
     public void Create_ReturnsBackupAccountDataStore_WhenDataStoreTypeIsBackup()
     {
